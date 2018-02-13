@@ -3,20 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package a1;
+package myGameEngine;
 
 import net.java.games.input.Event;
 import ray.input.action.AbstractInputAction;
+import ray.rage.scene.controllers.RotationController;
+import ray.rml.Vector3f;
 
 /**
  *
  * @author Joe
  */
-public class MoveLeftAction extends  AbstractInputAction{
+public class Rotate extends AbstractInputAction{
 
     @Override
     public void performAction(float f, Event event) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+    }
+    public void handlerotation(int direction){
+        //direction 0 = left 1 = right 2 = up 3 = down
+        RotationController rc = new RotationController(Vector3f.createUnitVectorX(),-.02f);
+        
     }
     
 }
