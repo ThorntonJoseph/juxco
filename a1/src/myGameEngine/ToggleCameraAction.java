@@ -17,10 +17,10 @@ import ray.rml.Vector3f;
  *
  * @author Joe
  */
-public class ToggleCamera extends AbstractInputAction{
+public class ToggleCameraAction extends AbstractInputAction{
     private Camera camera;
     private SceneNode dolphinN,cameraN;
-    public ToggleCamera(Camera c ,SceneNode dN){
+    public ToggleCameraAction(Camera c ,SceneNode dN){
         camera=c;
         dolphinN =dN;
     }

@@ -4,8 +4,8 @@
  * and open the template in the editor.
  */
 package a1;
-import myGameEngine.ToggleCamera;
-import myGameEngine.MovementAction;
+import myGameEngine.ToggleCameraAction;
+import myGameEngine.PlayerMovementActions;
 import java.awt.Color;
 import java.awt.DisplayMode;
 import java.awt.GraphicsEnvironment;
@@ -55,6 +55,7 @@ public class MyGame extends VariableFrameRateGame{
     private InputManager im;
     private Action moveLeft,moveRight,Movement,moveForward,toggleCamera;
     int score=0;
+    private boolean onedge = false;
     
     
     public MyGame(){
@@ -76,6 +77,14 @@ public class MyGame extends VariableFrameRateGame{
     public float getdeltatime(){
         return deltaTime;
     }
+    
+    // set HUD edge for player
+    public void setedge(boolean set){
+        onedge = set;
+    }
+    public boolean getedge(){
+        return onedge;
+    }
     /**
      * @param args the command line arguments
      */
@@ -83,8 +92,8 @@ public class MyGame extends VariableFrameRateGame{
         im = new GenericInputManager();
         String kbName = im.getKeyboardName();
         // create actions for inputs 
-        Movement = new MovementAction(camera,dolphinN,this);
-        toggleCamera = new ToggleCamera(camera,dolphinN);
+        Movement = new PlayerMovementActions(camera,dolphinN,this);
+        toggleCamera = new ToggleCameraAction(camera,dolphinN);
         
         //instantiat controlls
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.W, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
@@ -115,21 +124,27 @@ public class MyGame extends VariableFrameRateGame{
 
     @Override
     protected void update(Engine engine) {
+        if(onedge == true){
+            dispStr = scoreS + "  Edge of boundry";
+            scoreS.toUpperCase();
+        }else
+            dispStr = scoreS + "  Within boundry";
         rs = (GL4RenderSystem) engine.getRenderSystem();
-		dispStr = "Score = " + score;
+		scoreS = "Score = " + score;
 		rs.setHUD(dispStr, 15, 15);
                 deltaTime= engine.getElapsedTimeMillis();
                 elapseTime += engine.getElapsedTimeMillis();
                 im.update(elapseTime);      
          // detect collissions
          for(int i = 0;i<scoringN.length;i++){
-             if(MovementAction.distance(camera.getPo(), (Vector3f) scoringN[i].getLocalPosition())<2.0f&& dolphinN.getChildCount()<3){
+             if(PlayerMovementActions.distance(camera.getPo(), (Vector3f) scoringN[i].getLocalPosition())<2.0f&& dolphinN.getChildCount()<3){
                  dolphinN.attachChild(scoringN[i]);
                  dolphinN.getChild(2).setLocalPosition(0.0f, 0.0f, 0.95f);
                  dolphinN.getChild(2).setLocalScale(0.1f, 0.1f, 0.1f);
+                 System.out.println(dolphinN.getChildCount());
                  System.out.println("good");
              }
-             if(MovementAction.distance((Vector3f)boxN.getLocalPosition(),(Vector3f) dolphinN.getLocalPosition())<2.0f&&dolphinN.getChildCount()>2){
+             if(PlayerMovementActions.distance((Vector3f)boxN.getLocalPosition(),(Vector3f) dolphinN.getLocalPosition())<2.0f&&dolphinN.getChildCount()>2){
                 Node temp = dolphinN.getChild(2);
                 dolphinN.detachChild(dolphinN.getChild(2));
                 boxN.attachChild(temp);
@@ -160,17 +175,28 @@ public class MyGame extends VariableFrameRateGame{
         sm.addController(rc);
         // manual objects
         ManualObject box = makeScoreObject(engine,sm); 
-        ManualObject coord = makeWorldCoord(engine,sm);
+        ManualObject coordX = makeWorldCoordX(engine,sm);
+        ManualObject coordY = makeWorldCoordY(engine,sm);
+        ManualObject coordZ = makeWorldCoordZ(engine,sm);
         ManualObject boundry = makeWorldBoundry(engine,sm);
+        
         // scene nodes
         SceneNode BNode = sm.getRootSceneNode().createChildSceneNode("worldboundry");
-        SceneNode coordN = sm.getRootSceneNode().createChildSceneNode("coordN");
+        SceneNode coordXN = sm.getRootSceneNode().createChildSceneNode("coordNX");
+        SceneNode coordYN = sm.getRootSceneNode().createChildSceneNode("coordNY");
+        SceneNode coordZN = sm.getRootSceneNode().createChildSceneNode("coordNZ");
+        
         boxN = sm.getRootSceneNode().createChildSceneNode("box");
         scoringN = new SceneNode[50];
         SceneNode dolphinObjN = sm.createSceneNode("dolphinObjN");
         // Entities
         Entity scoringE[] = new Entity[50];
         Entity dolphinE = sm.createEntity("myDolphin", "dolphinHighPoly.obj");
+        // set primitive draw style
+        coordX.setPrimitive(Primitive.LINES);
+        coordY.setPrimitive(Primitive.LINES);
+        coordZ.setPrimitive(Primitive.LINES);
+        dolphinE.setPrimitive(Primitive.TRIANGLES);
         
         // create nodes for score objects
         for(int i=0;i<50;i++){
@@ -190,18 +216,24 @@ public class MyGame extends VariableFrameRateGame{
         }
         // instatiate dolphin and manual objects and add rotation controller
         BNode.attachObject(boundry);
-        coordN.attachObject(coord);
+        coordXN.attachObject(coordX);
+        coordYN.attachObject(coordY);
+        coordZN.attachObject(coordZ);
+        
         boxN.attachObject(box);
         rc.addNode(boxN);
 
         // set up nodes and positions
-         dolphinE.setPrimitive(Primitive.TRIANGLES);
+         
         dolphinN = sm.getRootSceneNode().createChildSceneNode("dolphinN");
         dolphinCN=sm.createSceneNode("dolphinCN");
         dolphinObjN.attachObject(dolphinE);
         // set initail positions of game objects
         dolphinN.setLocalPosition(0.0f,50f,0.0f);
         boxN.setLocalPosition(5f,50f,0.0f);
+        coordXN.setLocalPosition(0.0f,50f,0.0f);
+        coordYN.setLocalPosition(0.0f,50f,0.0f);
+        coordZN.setLocalPosition(0.0f,50f,0.0f);
         camera.setPo((Vector3f) Vector3f.createFrom(0.0f, 50f, 2.0f));
         dolphinCN.setLocalPosition(0.0f, 0.4f, -0.8f);
         dolphinCN.attachObject(camera);
@@ -210,18 +242,87 @@ public class MyGame extends VariableFrameRateGame{
        
         // setting up the lights
         sm.getAmbientLight().setIntensity(new Color(.1f, .1f, .1f));
-		Light plight = sm.createLight("testLamp1", Light.Type.POINT);
-		plight.setAmbient(new Color(.3f, .3f, .3f));
+        Light plight = sm.createLight("testLamp1", Light.Type.POINT);
+        plight.setAmbient(new Color(.3f, .3f, .3f));
         plight.setDiffuse(new Color(.7f, .7f, .7f));
-		plight.setSpecular(new Color(1.0f, 1.0f, 1.0f));
-        plight.setRange(5f);
+        plight.setSpecular(new Color(0.7f, 0.7f, 0.7f));
+        plight.setRange(200f);
+        plight.setConstantAttenuation(0f);
+        plight.setQuadraticAttenuation(0.0f);
+        plight.setLinearAttenuation(0.01f);
 		
-		SceneNode plightNode = sm.getRootSceneNode().createChildSceneNode("plightNode");
+	SceneNode plightNode = sm.getRootSceneNode().createChildSceneNode("plightNode");
+        plightNode.setLocalPosition(49.0f, 99f, 49.0f);
         plightNode.attachObject(plight);
         setupInputs();
     }
-     protected ManualObject makeWorldCoord(Engine eng, SceneManager sm)throws IOException{
-        ManualObject coord = sm.createManualObject("coord");
+     protected ManualObject makeWorldCoordY(Engine eng, SceneManager sm)throws IOException{
+        ManualObject coord = sm.createManualObject("coordY");
+        ManualObjectSection coordSec = coord.createManualSection("coordSec");
+        coord.setGpuShaderProgram(sm.getRenderSystem()
+                 .getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
+        float[] verticies = new float[] {0.0f,0.0f,0.0f,
+         0.0f,1.0f,0.0f };
+        float[] texcoords = new float[] {0.0f,0.0f,0.0f,1.0f};
+        float[] normals = new float[] {0.0f,1.0f,0.0f,
+         1.0f,0.0f,0.0f,};
+        int[] indices = new int[] {1,2};  
+        
+        FloatBuffer vertBuf = BufferUtil.directFloatBuffer(verticies);
+        FloatBuffer normBuf = BufferUtil.directFloatBuffer(normals);
+        FloatBuffer texBuf = BufferUtil.directFloatBuffer(texcoords);
+        IntBuffer indexBuf = BufferUtil.directIntBuffer(indices);
+        
+        coordSec.setVertexBuffer(vertBuf);
+        coordSec.setTextureCoordsBuffer(texBuf);
+        coordSec.setNormalsBuffer(normBuf);
+        coordSec.setIndexBuffer(indexBuf);
+        
+        Material mat =  sm.getMaterialManager().createManualAsset("YaxisM");
+        mat.setEmissive(Color.YELLOW);
+     
+        TextureState texState = (TextureState)sm.getRenderSystem().
+        createRenderState(RenderState.Type.TEXTURE);
+        coord.setDataSource(DataSource.VERTEX_BUFFER);
+        coord.setRenderState((RenderState)texState);
+        coord.setMaterial(mat);
+        
+        return coord;
+     }
+     protected ManualObject makeWorldCoordZ(Engine eng, SceneManager sm)throws IOException{
+        ManualObject coord = sm.createManualObject("coordZ");
+        ManualObjectSection coordSec = coord.createManualSection("coordSec");
+        coord.setGpuShaderProgram(sm.getRenderSystem()
+                 .getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
+        float[] verticies = new float[] {0.0f,0.0f,0.0f,
+         0.0f,0.0f,1.0f };
+        float[] texcoords = new float[] {0.0f,0.0f,0.0f,1.0f};
+        float[] normals = new float[] {0.0f,1.0f,0.0f,
+         0.0f,1.0f,0.0f,};
+        int[] indices = new int[] {1,2};  
+        
+        FloatBuffer vertBuf = BufferUtil.directFloatBuffer(verticies);
+        FloatBuffer normBuf = BufferUtil.directFloatBuffer(normals);
+        FloatBuffer texBuf = BufferUtil.directFloatBuffer(texcoords);
+        IntBuffer indexBuf = BufferUtil.directIntBuffer(indices);
+        
+        coordSec.setVertexBuffer(vertBuf);
+        coordSec.setTextureCoordsBuffer(texBuf);
+        coordSec.setNormalsBuffer(normBuf);
+        coordSec.setIndexBuffer(indexBuf);
+        
+        Material mat =  sm.getMaterialManager().createManualAsset("ZaxisM");
+        mat.setEmissive(Color.BLUE);
+        TextureState texState = (TextureState)sm.getRenderSystem().
+        createRenderState(RenderState.Type.TEXTURE);
+        coord.setDataSource(DataSource.VERTEX_BUFFER);
+        coord.setRenderState((RenderState)texState);
+        coord.setMaterial(mat);
+        
+        return coord;
+     }
+     protected ManualObject makeWorldCoordX(Engine eng, SceneManager sm)throws IOException{
+        ManualObject coord = sm.createManualObject("coordX");
         ManualObjectSection coordSec = coord.createManualSection("coordSec");
         coord.setGpuShaderProgram(sm.getRenderSystem()
                  .getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
@@ -242,23 +343,17 @@ public class MyGame extends VariableFrameRateGame{
         coordSec.setNormalsBuffer(normBuf);
         coordSec.setIndexBuffer(indexBuf);
         
-        Material mat =  sm.getMaterialManager().getAssetByPath("default.mtl");
-        mat.setEmissive(Color.BLUE);
-        ray.rage.asset.texture.Texture tex = eng.getTextureManager().getAssetByPath(mat.getTextureFilename());
+        Material mat =  sm.getMaterialManager().createManualAsset("XaxisM");
+        mat.setEmissive(Color.RED);
         TextureState texState = (TextureState)sm.getRenderSystem().
         createRenderState(RenderState.Type.TEXTURE);
-        texState.setTexture(tex);
         coord.setDataSource(DataSource.VERTEX_BUFFER);
         coord.setRenderState((RenderState)texState);
         coord.setMaterial(mat);
         
         return coord;
      }
-   
-        
       
-         
-     
      protected ManualObject makeScoreObject(Engine eng, SceneManager sm)throws IOException{
         ManualObject box = sm.createManualObject("Pyramid");
         ManualObjectSection boxSec = box.createManualSection("PyramidSection");
@@ -332,8 +427,9 @@ public class MyGame extends VariableFrameRateGame{
         box.setDataSource(DataSource.INDEX_BUFFER);
         box.setRenderState((RenderState)texState);
         box.setRenderState(faceState);
+        Material mat =  sm.getMaterialManager().getAssetByPath("earth.mtl");
     
-        //pyr.setMaterial(mat);
+        box.setMaterial(mat);
         return box;
             
      }
@@ -343,9 +439,9 @@ public class MyGame extends VariableFrameRateGame{
     { rs.createRenderWindow(new DisplayMode(1000, 700, 24, 60), false);
     }
     protected ManualObject makeWorldBoundry(Engine eng, SceneManager sm)throws IOException{
-        ManualObject pyr = sm.createManualObject("WorldBoundry");
-        ManualObjectSection pyrSec = pyr.createManualSection("Worldsec");
-        pyr.setGpuShaderProgram(sm.getRenderSystem().
+        ManualObject worldBoundry = sm.createManualObject("WorldBoundry");
+        ManualObjectSection pyrSec = worldBoundry.createManualSection("Worldsec");
+        worldBoundry.setGpuShaderProgram(sm.getRenderSystem().
             getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
         
         float [] verticies = new float[] 
@@ -421,13 +517,14 @@ public class MyGame extends VariableFrameRateGame{
         FrontFaceState faceState = (FrontFaceState) sm.getRenderSystem().
         createRenderState(RenderState.Type.FRONT_FACE);
         faceState.setVertexWinding(FrontFaceState.VertexWinding.CLOCKWISE);
-        pyr.setDataSource(DataSource.INDEX_BUFFER);
-        pyr.setRenderState((RenderState)texState);
-        pyr.setRenderState(faceState);
-        
+        worldBoundry.setDataSource(DataSource.INDEX_BUFFER);
+        worldBoundry.setRenderState((RenderState)texState);
+        worldBoundry.setRenderState(faceState);
+        Material mat =  sm.getMaterialManager().getAssetByPath("earth.mtl");
+       
     
-        //pyr.setMaterial(mat);
-        return pyr;
+        worldBoundry.setMaterial(mat);
+        return worldBoundry;
             
      }
     

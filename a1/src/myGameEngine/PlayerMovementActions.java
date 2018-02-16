@@ -22,12 +22,12 @@ import ray.rml.Vector4f;
  *
  * @author Joe
  */
-    public class MovementAction extends AbstractInputAction {
+    public class PlayerMovementActions extends AbstractInputAction {
         private Camera playerC;
         private SceneNode playerD;
         private MyGame game;
         Matrix4f rx,ry,rz;
-    public MovementAction(Camera c,SceneNode dN,MyGame g){
+    public PlayerMovementActions(Camera c,SceneNode dN,MyGame g){
         // matrix creation vectors
         game =g;
         playerC = c;
@@ -49,6 +49,7 @@ import ray.rml.Vector4f;
             return (float) r;
             
     }
+   
     @Override
     public void performAction(float f, Event event) {
         // dolphin variables
@@ -140,13 +141,17 @@ import ray.rml.Vector4f;
             }
             // keeps player from moving too far away from the dolphin
             Vector3f relloc;
-           float dist = distance((Vector3f) playerD.getLocalPosition(),playerC.getPo());
+            float dist = distance((Vector3f) playerD.getLocalPosition(),playerC.getPo());
             if( dist >= 5.0f){
-                Vector3f temp = (Vector3f) Vector3f.createFrom((playerD.getLocalPosition().x()-playerC.getPo().x())/dist, 
-                        (playerD.getLocalPosition().y()-playerC.getPo().y())/dist, (playerD.getLocalPosition().z()-playerC.getPo().z())/dist);
-                temp.mult(5.0f);
-                playerC.setPo((Vector3f) Vector3f.createFrom(playerC.getPo().x()+temp.x(), playerC.getPo().y()+temp.y(), playerC.getPo().z()+temp.z()));
-                System.out.println("get back on the dolphin to go further");
+                Vector3f temp = (Vector3f) Vector3f.createFrom((playerC.getPo().x()-playerD.getLocalPosition().x())/dist, 
+                        (playerC.getPo().y()-playerD.getLocalPosition().y())/dist, (playerC.getPo().z()-playerD.getLocalPosition().z())/dist);
+                temp= (Vector3f) Vector3f.createFrom(temp.x()*5.0f, temp.y() *5.0f, temp.z()*5.0f);
+              
+                playerC.setPo((Vector3f) Vector3f.createFrom(playerD.getLocalPosition().x()+temp.x(), playerD.getLocalPosition().y()+temp.y(), 
+                        playerD.getLocalPosition().z()+temp.z()));
+               game.setedge(true);
+            }else{
+               game.setedge(false);
             }
            
         // player is on the dolphin
