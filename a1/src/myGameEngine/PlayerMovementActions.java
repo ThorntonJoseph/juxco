@@ -10,12 +10,10 @@ import net.java.games.input.Event;
 import ray.input.action.AbstractInputAction;
 import ray.rage.scene.Camera;
 import ray.rage.scene.SceneNode;
-import ray.rage.scene.controllers.RotationController;
 import ray.rml.Degreef;
 import ray.rml.Matrix4f;
 import ray.rml.Vector3;
 import ray.rml.Vector3f;
-import ray.rml.Vector4;
 import ray.rml.Vector4f;
 
 /**
@@ -46,8 +44,7 @@ import ray.rml.Vector4f;
             z=z*z;
             r=x+y+z;
             r = Math.sqrt(r);
-            return (float) r;
-            
+            return (float) r; 
     }
    
     @Override
@@ -60,33 +57,26 @@ import ray.rml.Vector4f;
         //player is camera 
         if(playerC.getMode()=='c'){
             //roating the camera
-            if(event.getComponent().toString().equals("Up")){
-                rx = (Matrix4f) Matrix4f.createRotationFrom(Degreef.createFrom(2.0f), playerC.getRt());
+            if(event.getComponent().toString().equals("Up")||event.getComponent().toString().equals("Down")
+                    ||(event.getComponent().toString().equals("Y Rotation")&& (event.getValue()>0.2f||event.getValue()<-0.2f))){
+                    float temp = event.getValue();
+                    if(event.getComponent().toString().equals("Down")||event.getComponent().toString().equals("Y Rotation"))
+                        temp = -temp;
+                    
+                rx = (Matrix4f) Matrix4f.createRotationFrom(Degreef.createFrom(2.0f*temp*game.getdeltatime()/10f), playerC.getRt());
                 ra1 =(Vector4f) Vector4f.createNormalizedFrom(playerC.getUp());
                 r1 = (Vector4f) rx.mult(ra1);
                 playerC.setUp((Vector3f) Vector3f.createFrom(r1.x(), r1.y(), r1.z()));
                 ra2 = (Vector4f) Vector4f.createNormalizedFrom(playerC.getFd());
                 r2 = (Vector4f) rx.mult(ra2);
                 playerC.setFd((Vector3f) Vector3f.createFrom(r2.x(), r2.y(), r2.z()));
-      
-            }else if(event.getComponent().toString().equals("Down")){
-                rx = (Matrix4f) Matrix4f.createRotationFrom(Degreef.createFrom(-2.0f), playerC.getRt());
-                ra1 =(Vector4f) Vector4f.createNormalizedFrom(playerC.getUp());
-                r1 = (Vector4f) rx.mult(ra1);
-                playerC.setUp((Vector3f) Vector3f.createFrom(r1.x(), r1.y(), r1.z()));
-                ra2 = (Vector4f) Vector4f.createNormalizedFrom(playerC.getFd());
-                r2 = (Vector4f) rx.mult(ra2);
-                playerC.setFd((Vector3f) Vector3f.createFrom(r2.x(), r2.y(), r2.z()));
-            }else if(event.getComponent().toString().equals("Left")){
-                ry = (Matrix4f) Matrix4f.createRotationFrom(Degreef.createFrom(2.0f), playerC.getUp());
-                ra1 =(Vector4f) Vector4f.createNormalizedFrom(playerC.getFd());
-                r1 = (Vector4f) ry.mult(ra1);
-                playerC.setFd((Vector3f) Vector3f.createFrom(r1.x(), r1.y(), r1.z()));
-                ra2 = (Vector4f) Vector4f.createNormalizedFrom(playerC.getRt());
-                r2 = (Vector4f) ry.mult(ra2);
-                playerC.setRt((Vector3f) Vector3f.createFrom(r2.x(), r2.y(), r2.z()));
-            }else if(event.getComponent().toString().equals("Right")){
-                ry = (Matrix4f) Matrix4f.createRotationFrom(Degreef.createFrom(-2.0f), playerC.getUp());
+               
+            }else if(event.getComponent().toString().equals("Left")||event.getComponent().toString().equals("Right")
+                    ||(event.getComponent().toString().equals("X Rotation")&& (event.getValue()>0.2f||event.getValue()<-0.2f))){
+                float temp = event.getValue();
+                if(event.getComponent().toString().equals("Right")||event.getComponent().toString().equals("X Rotation"))
+                    temp = -temp;
+                ry = (Matrix4f) Matrix4f.createRotationFrom(Degreef.createFrom(temp*game.getdeltatime()/10f*2.0f), playerC.getUp());
                 ra1 =(Vector4f) Vector4f.createNormalizedFrom(playerC.getFd());
                 r1 = (Vector4f) ry.mult(ra1);
                 playerC.setFd((Vector3f) Vector3f.createFrom(r1.x(), r1.y(), r1.z()));
@@ -95,28 +85,24 @@ import ray.rml.Vector4f;
                 playerC.setRt((Vector3f) Vector3f.createFrom(r2.x(), r2.y(), r2.z()));
             }
             // forward, backward left right movement/ WASD
-            else if(event.getComponent().toString().equals("A")){
+            else if(event.getComponent().toString().equals("A")||event.getComponent().toString().equals("D")
+                    ||(event.getComponent().toString().equals("X Axis")&&(event.getValue()>0.2f||event.getValue()<-0.2f))){
+                float temp = event.getValue();
+                if(event.getComponent().toString().equals("A"))
+                    temp =-temp;
                 cv = playerC.getRt();
                 cp = playerC.getPo();
-                cp1 = (Vector3f) Vector3f.createFrom(-(game.getdeltatime()*cv.x())/100f, -(game.getdeltatime()*cv.y())/100f, -(game.getdeltatime()*cv.z())/100f);
+                cp1 = (Vector3f) Vector3f.createFrom(temp * game.getdeltatime()*cv.x()/100f, temp * game.getdeltatime()*cv.y()/100f, temp * game.getdeltatime()*cv.z()/100f);
                 cp2 = (Vector3f) cp.add((Vector3)cp1);
                 playerC.setPo((Vector3f)Vector3f.createFrom(cp2.x(),cp2.y(),cp2.z()));
-            }else if(event.getComponent().toString().equals("W")){
+            }else if(event.getComponent().toString().equals("W")||event.getComponent().toString().equals("S")||
+                    (event.getComponent().toString().equals("Y Axis")&&(event.getValue()>0.2f||event.getValue()<-0.2f))){
+                float temp = event.getValue();
+                if(event.getComponent().toString().equals("S")||event.getComponent().toString().equals("Y Axis"))
+                   temp = -temp;
                 cv = playerC.getFd();
                 cp = playerC.getPo();
-                cp1 = (Vector3f) Vector3f.createFrom((game.getdeltatime()*cv.x())/100f, (game.getdeltatime()*cv.y())/100f, (game.getdeltatime()*cv.z())/100f);
-                cp2 = (Vector3f) cp.add((Vector3)cp1);
-                playerC.setPo((Vector3f)Vector3f.createFrom(cp2.x(),cp2.y(),cp2.z()));
-            }else if(event.getComponent().toString().equals("S")){
-                cv = playerC.getFd();
-                cp = playerC.getPo();
-                cp1 = (Vector3f) Vector3f.createFrom(-(game.getdeltatime()*cv.x())/100f, -(game.getdeltatime()*cv.y())/100f, -(game.getdeltatime()*cv.z())/100f);
-                cp2 = (Vector3f) cp.add((Vector3)cp1);
-                playerC.setPo((Vector3f)Vector3f.createFrom(cp2.x(),cp2.y(),cp2.z()));
-            }else if(event.getComponent().toString().equals("D")){
-                cv = playerC.getRt();
-                cp = playerC.getPo();
-                cp1 = (Vector3f) Vector3f.createFrom((game.getdeltatime()*cv.x())/100f, (game.getdeltatime()*cv.y())/100f, (game.getdeltatime()*cv.z())/100f);
+                cp1 = (Vector3f) Vector3f.createFrom((temp*game.getdeltatime()*cv.x())/100f, (temp*game.getdeltatime()*cv.y())/100f, (temp*game.getdeltatime()*cv.z())/100f);
                 cp2 = (Vector3f) cp.add((Vector3)cp1);
                 playerC.setPo((Vector3f)Vector3f.createFrom(cp2.x(),cp2.y(),cp2.z()));
             }
@@ -157,38 +143,40 @@ import ray.rml.Vector4f;
         // player is on the dolphin
         }else{
         //rotating the dolphin /arrow keys
-            if(event.getComponent().toString().equals("Right")){
-                playerD.yaw(Degreef.createFrom(-2f));
+            if(event.getComponent().toString().equals("Left")||event.getComponent().toString().equals("Right")
+                    ||(event.getComponent().toString().equals("X Rotation")&& (event.getValue()>0.2f||event.getValue()<-0.2f))){
+                float temp = event.getValue();
+                if(event.getComponent().toString().equals("Left"))
+                    temp = -temp;
+                playerD.yaw(Degreef.createFrom(-2f*temp));
         //playerD.rotate(Degreef.createFrom(-2f), playerD.getLocalUpAxis());
-            }else if(event.getComponent().toString().equals("Left")){
-                playerD.yaw(Degreef.createFrom(2f));
-            }else if(event.getComponent().toString().equals("Down")){
-                playerD.pitch(Degreef.createFrom(2f));
-            }else if(event.getComponent().toString().equals("Up")){
-                playerD.pitch(Degreef.createFrom(-2f));
+            }else if(event.getComponent().toString().equals("Up")||event.getComponent().toString().equals("Down")
+                    ||(event.getComponent().toString().equals("Y Rotation")&& (event.getValue()>0.2f||event.getValue()<-0.2f))){
+                float temp = event.getValue();
+                if(event.getComponent().toString().equals("Up"))
+                    temp = -temp;
+                playerD.pitch(Degreef.createFrom(2f*temp));
+            
 
         //forward,back,left right movement on dolphin/WASD
-            }else if(event.getComponent().toString().equals("W")){
-                p = playerD.getWorldForwardAxis();
-                p1 = Vector3f.createFrom(game.getdeltatime()*p.x()/100f,game.getdeltatime()*p.y()/100f,game.getdeltatime()*p.z()/100f);
-                p2 = p.add(p1);
-                playerD.setLocalPosition(playerD.getWorldPosition().add(p1));
-            }else if(event.getComponent().toString().equals("A")){
+            }else if(event.getComponent().toString().equals("A")||event.getComponent().toString().equals("D")
+                    ||(event.getComponent().toString().equals("X Axis")&&(event.getValue()>0.2f||event.getValue()<-0.2f))){
+                float temp = event.getValue();
+                if(event.getComponent().toString().equals("A"))
+                    temp =-temp;
                 p = playerD.getWorldRightAxis();
-                p1 = Vector3f.createFrom(game.getdeltatime()*p.x()/100f,game.getdeltatime()*p.y()/100f,game.getdeltatime()*p.z()/100f);
+                p1 = Vector3f.createFrom(temp*game.getdeltatime()*p.x()/100f,temp*game.getdeltatime()*p.y()/100f,temp*game.getdeltatime()*p.z()/100f);
                 p2 = p.add(p1);
                 playerD.setLocalPosition(playerD.getWorldPosition().add(p1));
-            }else if(event.getComponent().toString().equals("S")){
+            }else if(event.getComponent().toString().equals("W")||event.getComponent().toString().equals("S")||
+                    (event.getComponent().toString().equals("Y Axis")&&(event.getValue()>0.2f||event.getValue()<-0.2f))){
+                float temp = event.getValue();
+                if(event.getComponent().toString().equals("S")||event.getComponent().toString().equals("Y Axis"))
+                   temp = -temp;
                 p = playerD.getWorldForwardAxis();
-                p1 = Vector3f.createFrom(-(game.getdeltatime()*p.x())/100f,-(game.getdeltatime()*p.y())/100f,-game.getdeltatime()*p.z()/100f);
+                p1 = Vector3f.createFrom(temp* game.getdeltatime()*p.x()/100f,temp*game.getdeltatime()*p.y()/100f,temp*game.getdeltatime()*p.z()/100f);
                 p2 = p.add(p1);
                 playerD.setLocalPosition(playerD.getWorldPosition().add(p1));
-            }else if(event.getComponent().toString().equals("D")){
-                p = playerD.getWorldRightAxis();
-                p1 = Vector3f.createFrom(-game.getdeltatime()/100f*p.x(),-game.getdeltatime()*p.y()/100f,-game.getdeltatime()*p.z()/100f);
-                p2 = p.add(p1);
-                playerD.setLocalPosition(playerD.getWorldPosition().add(p1));
- 
             }
             // creates boundries for dolphins
             if(playerD.getLocalPosition().x()>49.9f){
@@ -212,6 +200,12 @@ import ray.rml.Vector4f;
         }
         
 
+    }
+    public void Movecamera(float howmuch){
+        
+    }
+    public void MoveDolphin(float howmuch){
+        
     }
     
 }

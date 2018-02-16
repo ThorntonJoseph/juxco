@@ -36,6 +36,8 @@ import ray.rage.util.BufferUtil;
 import ray.rml.Degreef;
 import ray.rml.Vector3f;
 import java.util.Random;
+import net.java.games.input.Controller;
+
 
 /**
  *
@@ -90,12 +92,25 @@ public class MyGame extends VariableFrameRateGame{
      */
     protected void setupInputs(){
         im = new GenericInputManager();
-        String kbName = im.getKeyboardName();
+        
+            String cnName = im.getFirstGamepadName();
+        
+        
+        String kbName=im.getKeyboardName();
         // create actions for inputs 
         Movement = new PlayerMovementActions(camera,dolphinN,this);
         toggleCamera = new ToggleCameraAction(camera,dolphinN);
-        
+       
         //instantiat controlls
+        if(cnName!=null){
+          im.associateAction(cnName, net.java.games.input.Component.Identifier.Axis.RX, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+          im.associateAction(cnName, net.java.games.input.Component.Identifier.Axis.RY, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+          im.associateAction(cnName, net.java.games.input.Component.Identifier.Button._0, toggleCamera, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+          im.associateAction(cnName, net.java.games.input.Component.Identifier.Axis.X, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+          im.associateAction(cnName, net.java.games.input.Component.Identifier.Axis.Y, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        }else
+            System.out.println("plug a controller in");
+         
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.W, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.A, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.S, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
@@ -427,7 +442,8 @@ public class MyGame extends VariableFrameRateGame{
         box.setDataSource(DataSource.INDEX_BUFFER);
         box.setRenderState((RenderState)texState);
         box.setRenderState(faceState);
-        Material mat =  sm.getMaterialManager().getAssetByPath("earth.mtl");
+        Material mat =  sm.getMaterialManager().getAssetByPath("default.mtl");
+        mat.setEmissive(Color.YELLOW);
     
         box.setMaterial(mat);
         return box;

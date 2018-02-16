@@ -26,9 +26,10 @@ public class ToggleCameraAction extends AbstractInputAction{
     }
     @Override
     public void performAction(float f, Event event) {
+        System.out.println(event.getComponent().toString());
         System.out.println(event.getComponent().getName());
        if(camera.getMode()=='c'){
-           camera.setMode('n');
+           camera.setMode('n');  
        }else{       
            
            camera.setMode('c');
