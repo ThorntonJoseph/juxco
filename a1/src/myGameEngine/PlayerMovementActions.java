@@ -165,7 +165,7 @@ import ray.rml.Vector4f;
                 if(event.getComponent().toString().equals("A"))
                     temp =-temp;
                 p = playerD.getWorldRightAxis();
-                p1 = Vector3f.createFrom(temp*game.getdeltatime()*p.x()/100f,temp*game.getdeltatime()*p.y()/100f,temp*game.getdeltatime()*p.z()/100f);
+                p1 = Vector3f.createFrom(-temp*game.getdeltatime()*p.x()/100f,-temp*game.getdeltatime()*p.y()/100f,-temp*game.getdeltatime()*p.z()/100f);
                 p2 = p.add(p1);
                 playerD.setLocalPosition(playerD.getWorldPosition().add(p1));
             }else if(event.getComponent().toString().equals("W")||event.getComponent().toString().equals("S")||

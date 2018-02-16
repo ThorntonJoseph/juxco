@@ -56,7 +56,7 @@ public class MyGame extends VariableFrameRateGame{
     SceneNode [] scoringN;
     private InputManager im;
     private Action moveLeft,moveRight,Movement,moveForward,toggleCamera;
-    int score=0;
+    int score=0,n=2;
     private boolean onedge = false;
     
     
@@ -152,21 +152,45 @@ public class MyGame extends VariableFrameRateGame{
                 im.update(elapseTime);      
          // detect collissions
          for(int i = 0;i<scoringN.length;i++){
-             if(PlayerMovementActions.distance(camera.getPo(), (Vector3f) scoringN[i].getLocalPosition())<2.0f&& dolphinN.getChildCount()<3){
+             if(PlayerMovementActions.distance(camera.getPo(), (Vector3f) scoringN[i].getLocalPosition())<2.0f&& i<scoringN.length){
                  dolphinN.attachChild(scoringN[i]);
-                 dolphinN.getChild(2).setLocalPosition(0.0f, 0.0f, 0.95f);
-                 dolphinN.getChild(2).setLocalScale(0.1f, 0.1f, 0.1f);
-                 System.out.println(dolphinN.getChildCount());
-                 System.out.println("good");
+                 if(n==2)
+                    dolphinN.getChild(n).setLocalPosition(0.0f, 0.0f, 0.95f);
+                 else
+                       dolphinN.getChild(n).setLocalPosition(0.0f,0.38f*(n-2),0.95f);
+                 
+                 dolphinN.getChild(n).setLocalScale(0.1f, 0.1f, 0.1f);
+                 n=n+1;
              }
              if(PlayerMovementActions.distance((Vector3f)boxN.getLocalPosition(),(Vector3f) dolphinN.getLocalPosition())<2.0f&&dolphinN.getChildCount()>2){
+                 float xd=1.0f,zd=1.0f;
+                 if(score<6||(score>11&&score<18)||(score>23&&score<30)||(score<36&&score>41))
+                 {
+                     xd= xd-(score+6)%6*0.38f;
+                     if(score<6||(score>17&&score<24)||(score>35&&score<42))
+                        zd =1.0f;
+                     else {
+                         zd=-1.0f;
+                     }
+                         
+                 }else{
+                     zd=zd-score%6*0.38f;
+                     if((score>5&&score<12)||(score>34&&score<36)||(score>41&&score<48))
+                         xd=-1.0f;
+                     else
+                         xd=1.0f;
+                 }
+                 
                 Node temp = dolphinN.getChild(2);
                 dolphinN.detachChild(dolphinN.getChild(2));
+                n=2;
                 boxN.attachChild(temp);
+                boxN.getChild(score).setLocalPosition(-1f*xd,0.19f*(((int)score/24)+1),1f*zd);
                 score+=1;
              }
         }
     }
+    
 
     @Override
     protected void setupCameras(SceneManager sm, RenderWindow rw) {
