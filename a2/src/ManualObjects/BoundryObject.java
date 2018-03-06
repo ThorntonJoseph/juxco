@@ -46,19 +46,9 @@ public class BoundryObject {
             getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
         
         float [] verticies = new float[] 
-        { -400.0f, 0.0f, 400.0f, 400.0f, 0.0f, 400.0f, 400.0f, 800.0f, 400.0f, 
-            -400.0f, 0.0f, 400.0f,400.0f, 800.0f,400.0f, -400.0f, 800.0f, 400.0f,//front
-            -400.0f,0.0f,-400.0f,-400.0f,800.0f,-400.0f, 400.0f, 800.0f, -400.0f, 
-            -400.0f, 0.0f, -400.0f, 400.0f, 800.0f, -400.0f,400.0f,0.0f,-400.0f, //back
-            -400.0f, 0.0f, 400.0f, -400.0f, 800.0f, -400.0f, -400.0f, 0.0f, -400.0f, 
-            -400.0f, 0.0f, 400.0f,-400.0f, 800.0f,400.0f, -400.0f, 800.0f, -400.0f,//left
-            400.0f,0.0f,400.0f,400.0f,0.0f,-400.0f, 400.0f, 800.0f, -400.0f, 
-            400.0f, 0.0f, 400.0f, 400.0f, 800.0f, -400.0f,400.0f,800.0f,400.0f, //right
+        { 
             -400.0f, 0.0f, 400.0f, -400.0f, 0.0f, -400.0f, 400.0f, 0.0f, -400.0f, 
-            -400.0f, 0.0f, 400.0f,400.0f, 0.0f,-400.0f, 400.0f, 0.0f, 400.0f,//bottom
-            -400.0f, 800.0f, 400.0f, 400.0f, 800.0f, -400.0f, -400.0f, 800.0f, -400.0f, 
-            -400.0f, 800.0f, 400.0f,400.0f, 800.0f,400.0f, 400.0f, 800.0f, -400.0f //top
-            
+            -400.0f, 0.0f, 400.0f,400.0f, 0.0f,-400.0f, 400.0f, 0.0f, 400.0f,//bottom  
         };
         int i=0;
         while(i<verticies.length){
@@ -68,38 +58,18 @@ public class BoundryObject {
         }
             
         float[] texcoords = new float[]
-            { 0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f
-                
-        };
+            { 
+                0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
+                0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f        
+            };
         float[] normals = new float[]
-            { 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,//front
-            0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
-            0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,//front
-            -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-            -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,//left
-            1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,//right
+            { 
             0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
             0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,//bottom
-            0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,// top
-        };
+            };
            
                     
-        int[] indices = new int[] { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
-            17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36 };
+        int[] indices = new int[] { 0,1,2,3,4,5,6 };
             
         FloatBuffer vertBuf = BufferUtil.directFloatBuffer(verticies);
         FloatBuffer texBuf = BufferUtil.directFloatBuffer(texcoords);
@@ -111,7 +81,7 @@ public class BoundryObject {
         pyrSec.setNormalsBuffer(normBuf);
         pyrSec.setIndexBuffer(indexBuf);
         
-        ray.rage.asset.texture.Texture tex = eng.getTextureManager().getAssetByPath("earth-day.jpeg");
+        ray.rage.asset.texture.Texture tex = eng.getTextureManager().getAssetByPath("hexagons.jpeg");
         TextureState texState = (TextureState)sm.getRenderSystem().
         createRenderState(RenderState.Type.TEXTURE);
         texState.setTexture(tex);

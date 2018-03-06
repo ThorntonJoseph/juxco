@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 package a1;
+import ManualObjects.BoundryObject;
+import ManualObjects.BoxObject;
 import myGameEngine.ToggleCameraAction;
 import myGameEngine.PlayerMovementActions;
 import java.awt.Color;
@@ -93,11 +95,12 @@ public class MyGame extends VariableFrameRateGame{
      */
     protected void setupInputs(){
         im = new GenericInputManager();
-        
+       
             String cnName = im.getFirstGamepadName();
         
         
         String kbName=im.getKeyboardName();
+        System.out.println(kbName);
         // create actions for inputs 
         Movement = new PlayerMovementActions(camera,dolphinN,this);
         toggleCamera = new ToggleCameraAction(camera,dolphinN);
@@ -106,7 +109,7 @@ public class MyGame extends VariableFrameRateGame{
         if(cnName!=null){
           im.associateAction(cnName, net.java.games.input.Component.Identifier.Axis.RX, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
           im.associateAction(cnName, net.java.games.input.Component.Identifier.Axis.RY, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-          im.associateAction(cnName, net.java.games.input.Component.Identifier.Button._0, toggleCamera, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+          im.associateAction(cnName, net.java.games.input.Component.Identifier.Button._0, toggleCamera, InputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
           im.associateAction(cnName, net.java.games.input.Component.Identifier.Axis.X, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
           im.associateAction(cnName, net.java.games.input.Component.Identifier.Axis.Y, Movement, InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
         }else
@@ -165,6 +168,7 @@ public class MyGame extends VariableFrameRateGame{
              }
              if(PlayerMovementActions.distance((Vector3f)boxN.getLocalPosition(),(Vector3f) dolphinN.getLocalPosition())<2.0f&&dolphinN.getChildCount()>2){
                  float xd=1.0f,zd=1.0f;
+                 // makes objects rap arround box as they are put in
                  if(score<6||(score>11&&score<18)||(score>23&&score<30)||(score<36&&score>41))
                  {
                      xd= xd-(score+6)%6*0.38f;
@@ -210,18 +214,17 @@ public class MyGame extends VariableFrameRateGame{
     protected void setupScene(Engine engine, SceneManager sm) throws IOException {
         rn = new Random(50);
         // create manual object
-         new WorldCoords(sm.getRootSceneNode(),engine,sm);
+        new WorldCoords(sm.getRootSceneNode(),engine,sm);
+       
         RotationController rc = new RotationController(Vector3f.createUnitVectorY(),0.2f);
         sm.addController(rc);
         // manual objects
-        ManualObject box = makeScoreObject(engine,sm); 
-        
-        ManualObject boundry = makeWorldBoundry(engine,sm);
         
         // scene nodes
         SceneNode BNode = sm.getRootSceneNode().createChildSceneNode("worldboundry");
-        
+        new BoundryObject(BNode,engine,sm);
         boxN = sm.getRootSceneNode().createChildSceneNode("box");
+        new BoxObject(boxN,engine,sm);
         scoringN = new SceneNode[50];
         SceneNode dolphinObjN = sm.createSceneNode("dolphinObjN");
         // Entities
@@ -251,8 +254,7 @@ public class MyGame extends VariableFrameRateGame{
             rc.addNode(scoringN[i]);
         }
         // instatiate dolphin and manual objects and add rotation controller
-        BNode.attachObject(boundry);
-        boxN.attachObject(box);
+       
         rc.addNode(boxN);
 
         // set up nodes and positions
@@ -286,182 +288,9 @@ public class MyGame extends VariableFrameRateGame{
         plightNode.setLocalPosition(49.0f, 49f, 49.0f);
         plightNode.attachObject(plight);
         setupInputs();
-    }
-     
-      
-     protected ManualObject makeScoreObject(Engine eng, SceneManager sm)throws IOException{
-        ManualObject box = sm.createManualObject("Pyramid");
-        ManualObjectSection boxSec = box.createManualSection("PyramidSection");
-        box.setGpuShaderProgram(sm.getRenderSystem().
-            getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
-        
-        float [] verticies = new float[] 
-        { -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 2.0f, 1.0f, 
-            -1.0f, 0.0f, 1.0f,1.0f, 2.0f,1.0f, -1.0f, 2.0f, 1.0f,//front
-            -1.0f,0.0f,-1.0f,-1.0f,2.0f,-1.0f, 1.0f, 2.0f, -1.0f, 
-            -1.0f, 0.0f, -1.0f, 1.0f, 2.0f, -1.0f,1.0f,0.0f,-1.0f, //back
-            -1.0f, 0.0f, 1.0f, -1.0f, 2.0f, -1.0f, -1.0f, 0.0f, -1.0f, 
-            -1.0f, 0.0f, 1.0f,-1.0f, 2.0f,1.0f, -1.0f, 2.0f, -1.0f,//left
-            1.0f,0.0f,1.0f,1.0f,0.0f,-1.0f, 1.0f, 2.0f, -1.0f, 
-            1.0f, 0.0f, 1.0f, 1.0f, 2.0f, -1.0f,1.0f,2.0f,1.0f, //right
-            -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, -1.0f, 1.0f, 0.0f, -1.0f, 
-            -1.0f, 0.0f, 1.0f,1.0f, 0.0f,-1.0f, 1.0f, 0.0f, 1.0f,//bottom
-            -1.0f, 2.0f, 1.0f, 1.0f, 2.0f, -1.0f, -1.0f, 2.0f, -1.0f, 
-            -1.0f, 2.0f, 1.0f,1.0f, 2.0f,1.0f, 1.0f, 2.0f, -1.0f //top
-            
-        };
-        float[] texcoords = new float[]
-            { 0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f
-        };
-        float[] normals = new float[]
-            { 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,//front
-            0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
-            0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,//front
-            -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-            -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,//left
-            1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,//right
-            0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-            0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,//bottom
-            0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,// top
-        };
-           
-                    
-        int[] indices = new int[] { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
-            17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36 };
-            
-        FloatBuffer vertBuf = BufferUtil.directFloatBuffer(verticies);
-        FloatBuffer texBuf = BufferUtil.directFloatBuffer(texcoords);
-        FloatBuffer normBuf = BufferUtil.directFloatBuffer(normals);
-        IntBuffer indexBuf = BufferUtil.directIntBuffer(indices);
-        
-        boxSec.setVertexBuffer(vertBuf);
-        boxSec.setTextureCoordsBuffer(texBuf);
-        boxSec.setNormalsBuffer(normBuf);
-        boxSec.setIndexBuffer(indexBuf);
-        
-        ray.rage.asset.texture.Texture tex = eng.getTextureManager().getAssetByPath("moon.jpeg");
-        TextureState texState = (TextureState)sm.getRenderSystem().
-        createRenderState(RenderState.Type.TEXTURE);
-        texState.setTexture(tex);
-        FrontFaceState faceState = (FrontFaceState) sm.getRenderSystem().
-        createRenderState(RenderState.Type.FRONT_FACE);
-        box.setDataSource(DataSource.INDEX_BUFFER);
-        box.setRenderState((RenderState)texState);
-        box.setRenderState(faceState);
-        Material mat =  sm.getMaterialManager().getAssetByPath("default.mtl");
-        mat.setEmissive(Color.YELLOW);
-    
-        box.setMaterial(mat);
-        return box;
-            
-     }
-     
+    }   
     @Override
     protected void setupWindow(RenderSystem rs, GraphicsEnvironment ge)
     { rs.createRenderWindow(new DisplayMode(1000, 700, 24, 60), false);
     }
-    protected ManualObject makeWorldBoundry(Engine eng, SceneManager sm)throws IOException{
-        ManualObject worldBoundry = sm.createManualObject("WorldBoundry");
-        ManualObjectSection pyrSec = worldBoundry.createManualSection("Worldsec");
-        worldBoundry.setGpuShaderProgram(sm.getRenderSystem().
-            getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
-        
-        float [] verticies = new float[] 
-        { -400.0f, 0.0f, 400.0f, 400.0f, 0.0f, 400.0f, 400.0f, 800.0f, 400.0f, 
-            -400.0f, 0.0f, 400.0f,400.0f, 800.0f,400.0f, -400.0f, 800.0f, 400.0f,//front
-            -400.0f,0.0f,-400.0f,-400.0f,800.0f,-400.0f, 400.0f, 800.0f, -400.0f, 
-            -400.0f, 0.0f, -400.0f, 400.0f, 800.0f, -400.0f,400.0f,0.0f,-400.0f, //back
-            -400.0f, 0.0f, 400.0f, -400.0f, 800.0f, -400.0f, -400.0f, 0.0f, -400.0f, 
-            -400.0f, 0.0f, 400.0f,-400.0f, 800.0f,400.0f, -400.0f, 800.0f, -400.0f,//left
-            400.0f,0.0f,400.0f,400.0f,0.0f,-400.0f, 400.0f, 800.0f, -400.0f, 
-            400.0f, 0.0f, 400.0f, 400.0f, 800.0f, -400.0f,400.0f,800.0f,400.0f, //right
-            -400.0f, 0.0f, 400.0f, -400.0f, 0.0f, -400.0f, 400.0f, 0.0f, -400.0f, 
-            -400.0f, 0.0f, 400.0f,400.0f, 0.0f,-400.0f, 400.0f, 0.0f, 400.0f,//bottom
-            -400.0f, 800.0f, 400.0f, 400.0f, 800.0f, -400.0f, -400.0f, 800.0f, -400.0f, 
-            -400.0f, 800.0f, 400.0f,400.0f, 800.0f,400.0f, 400.0f, 800.0f, -400.0f //top
-            
-        };
-        int i=0;
-        while(i<verticies.length){
-            verticies[i]=verticies[i]/8f;
-            i++;
-            
-        }
-            
-        float[] texcoords = new float[]
-            { 0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f,
-            0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f
-                
-        };
-        float[] normals = new float[]
-            { 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,//front
-            0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,
-            0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f,//front
-            -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-            -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,//left
-            1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,//right
-            0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
-            0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,//bottom
-            0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,// top
-        };
-           
-                    
-        int[] indices = new int[] { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
-            17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36 };
-            
-        FloatBuffer vertBuf = BufferUtil.directFloatBuffer(verticies);
-        FloatBuffer texBuf = BufferUtil.directFloatBuffer(texcoords);
-        FloatBuffer normBuf = BufferUtil.directFloatBuffer(normals);
-        IntBuffer indexBuf = BufferUtil.directIntBuffer(indices);
-        
-        pyrSec.setVertexBuffer(vertBuf);
-        pyrSec.setTextureCoordsBuffer(texBuf);
-        pyrSec.setNormalsBuffer(normBuf);
-        pyrSec.setIndexBuffer(indexBuf);
-        
-        ray.rage.asset.texture.Texture tex = eng.getTextureManager().getAssetByPath("earth-day.jpeg");
-        TextureState texState = (TextureState)sm.getRenderSystem().
-        createRenderState(RenderState.Type.TEXTURE);
-        texState.setTexture(tex);
-        FrontFaceState faceState = (FrontFaceState) sm.getRenderSystem().
-        createRenderState(RenderState.Type.FRONT_FACE);
-        faceState.setVertexWinding(FrontFaceState.VertexWinding.CLOCKWISE);
-        worldBoundry.setDataSource(DataSource.INDEX_BUFFER);
-        worldBoundry.setRenderState((RenderState)texState);
-        worldBoundry.setRenderState(faceState);
-        Material mat =  sm.getMaterialManager().getAssetByPath("earth.mtl");
-       
-    
-        worldBoundry.setMaterial(mat);
-        return worldBoundry;
-            
-     }
-    
 }

@@ -113,10 +113,10 @@ import ray.rml.Vector4f;
             if(playerC.getPo().x()< -49.9f){
                 playerC.setPo((Vector3f) Vector3f.createFrom(-49.9f,playerC.getPo().y(),playerC.getPo().z()));
             }
-            if(playerC.getPo().y()>99.9f){
+            if(playerC.getPo().y()>49.9f){
                 playerC.setPo((Vector3f) Vector3f.createFrom(playerC.getPo().x(),99.9f,playerC.getPo().z()));
             }
-            if(playerC.getPo().y()<0.1f){
+            if(playerC.getPo().y()<-49.9f){
                 playerC.setPo((Vector3f) Vector3f.createFrom(playerC.getPo().x(),0.1f,playerC.getPo().z()));
             }
             if(playerC.getPo().z()>49.9f){
@@ -185,10 +185,10 @@ import ray.rml.Vector4f;
             if(playerD.getLocalPosition().x()< -49.9f){
                 playerD.setLocalPosition((Vector3f) Vector3f.createFrom(-49.9f,playerD.getLocalPosition().y(),playerD.getLocalPosition().z()));
             }
-            if(playerD.getLocalPosition().y()>99.9f){
+            if(playerD.getLocalPosition().y()>49.9f){
                 playerD.setLocalPosition((Vector3f) Vector3f.createFrom(playerD.getLocalPosition().x(),99.9f,playerD.getLocalPosition().z()));
             }
-            if(playerD.getLocalPosition().y()<0.1f){
+            if(playerD.getLocalPosition().y()<-49.9f){
                 playerD.setLocalPosition((Vector3f) Vector3f.createFrom(playerD.getLocalPosition().x(),0.1f,playerD.getLocalPosition().z()));
             }
             if(playerD.getLocalPosition().z()>49.9f){
