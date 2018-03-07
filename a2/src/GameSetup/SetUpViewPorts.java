@@ -6,6 +6,7 @@
 package GameSetup;
 
 import java.awt.Color;
+import ray.input.InputManager;
 import ray.rage.rendersystem.RenderWindow;
 import ray.rage.rendersystem.Viewport;
 
@@ -14,15 +15,22 @@ import ray.rage.rendersystem.Viewport;
  * @author Joe
  */
 public class SetUpViewPorts {
-    public SetUpViewPorts(RenderWindow rw){
-        setupWindowViewPorts(rw);
+    public SetUpViewPorts(RenderWindow rw,InputManager im){
+        setupWindowViewPorts(rw,im);
     }
-    protected void setupWindowViewPorts(RenderWindow rw){
-        Viewport p1View = rw.getViewport(0);
-        p1View.setDimensions(.51f,.01f,.99f,.49f);
-       
-        Viewport p2View = rw.createViewport(.01f, .01f,.99f,.49f);
+    protected void setupWindowViewPorts(RenderWindow rw,InputManager im){
+        if(im.getFirstGamepadName()!= null){
+            System.out.println("execute");
+            Viewport p1View = rw.getViewport(0);
+            p1View.setDimensions(.51f,.01f,.99f,.49f);
+            Viewport p2View = rw.createViewport(.01f, .01f,.99f,.49f);
+        }else
+        {
+            
+        }
+        }
+        
        
     }
     
-}
+

@@ -55,23 +55,13 @@ public class MyGame extends VariableFrameRateGame{
     private boolean onedge = false;
     private Camera3Pcontroller orbitController,orbitController2;
     private Controller controller1,controller2;
+    private SetUpInputs inputs;
     
     
     
     public MyGame(){
         super();
-        // moves the camera arround
-        System.out.println("Movement keys keys");
-        System.out.println("\t press A to move left");
-        System.out.println("\t press D to move right");
-        System.out.println("\t press S to move backward");
-        System.out.println("\t press W to move forward");
-        System.out.println("\t press spacebar to get on and off the dolphin");
-        System.out.println("Orientation keys");
-        System.out.println("\t press left arrow to rotate left arround vertical axis");
-        System.out.println("\t press right arrow to rotate right arround vertical axis");
-        System.out.println("\t press down arrow to rotate down arround horizontal axis");
-        System.out.println("\t press up arrow to rotate up arround horizontal axis");
+        
     }
     //allows functions to access delta time
     public float getdeltatime(){
@@ -89,10 +79,11 @@ public class MyGame extends VariableFrameRateGame{
      * @param args the command line arguments
      */
     protected void setupInputs(){
-        im = new GenericInputManager();
-        SetUpInputs si = new SetUpInputs(im,this,playerOneAvitarNode,playerOneView,playerTwoAvitarNode,playerTwoView);
-        controller2 = si.getGamepad();
-        controller1 = si.getKeboard();
+        
+        
+        inputs = new SetUpInputs(im,this,playerOneAvitarNode,playerOneView,playerTwoAvitarNode,playerTwoView);
+        controller2 = inputs.getGamepad();
+        controller1 = inputs.getKeboard();
     }
     public static void main(String[] args) {
         Game game = new MyGame();
@@ -125,15 +116,16 @@ public class MyGame extends VariableFrameRateGame{
                 im.update(elapseTime);      
          // detect collissions
          orbitController.updateCameraPositon();
-         orbitController2.updateCameraPositon();
-         
+         if(orbitController2 !=null){
+             orbitController2.updateCameraPositon();
+         } 
     }
     
 
     @Override
     protected void setupCameras(SceneManager sm, RenderWindow rw) {
         System.out.println("call1");
-       SetUpCameras sc = new SetUpCameras(sm,rw);
+       SetUpCameras sc = new SetUpCameras(sm,rw,im);
        playerOneView = sc.getPlayerOneCamera();
        playerOneCameraNode = sc.getPlayerOneCameraN();
        playerTwoView = sc.getPlayerTwoCamera();
@@ -142,14 +134,17 @@ public class MyGame extends VariableFrameRateGame{
     }
    @Override
     protected void  setupWindowViewports(RenderWindow rw){
-        new SetUpViewPorts(rw);
+        im = new GenericInputManager();
+        new SetUpViewPorts(rw,im);
     }
     protected void setupOrbitCamera(Engine eng, SceneManager sm){
             orbitController =
         new Camera3Pcontroller(playerOneView, playerOneCameraNode, playerOneAvitarNode, controller1,im);
-            orbitController2 = new Camera3Pcontroller(playerTwoView,playerTwoCameraNode,
+            if(inputs.getGamepad()!=null){
+                orbitController2 = new Camera3Pcontroller(playerTwoView,playerTwoCameraNode,
             playerTwoAvitarNode,controller2,im);
-        
+            }
+            
     }
     
     @Override
@@ -164,13 +159,13 @@ public class MyGame extends VariableFrameRateGame{
         
         // scene nodes
         playerOne = sm.getRootSceneNode().createChildSceneNode("playerOne");
-        playerTwo = sm.getRootSceneNode().createChildSceneNode("playerTwo");
+        
         SceneNode BNode = sm.getRootSceneNode().createChildSceneNode("worldboundry");
         new BoundryObject(BNode,engine,sm);
         boxN = sm.getRootSceneNode().createChildSceneNode("box");
         new BoxObject(boxN,engine,sm);
         playerOneAvitarNode = sm.createSceneNode("Player1Obj");
-        playerTwoAvitarNode = sm.createSceneNode("Player2Obj");
+        
         // Entities
         Entity playerOneAvitar = sm.createEntity("playerOneAvitar", "Gaol.obj");
         Entity playerTwoAvitar = sm.createEntity("playerTwoAvitar", "dolphinHighPoly.obj");
@@ -185,11 +180,16 @@ public class MyGame extends VariableFrameRateGame{
 
         // set up nodes and positions
         playerOneAvitarNode.attachObject(playerOneAvitar);
-        playerTwoAvitarNode.attachObject(playerTwoAvitar);
         playerOne.attachChild(playerOneAvitarNode);
-        playerTwo.attachChild(playerTwoAvitarNode);
-        playerOne.attachChild(playerOneCameraNode);
-        playerTwo.attachChild(playerTwoCameraNode);
+         playerOne.attachChild(playerOneCameraNode);
+        if(im.getFirstGamepadName() != null){
+            playerTwo = sm.getRootSceneNode().createChildSceneNode("playerTwo");
+            playerTwoAvitarNode = sm.createSceneNode("Player2Obj");
+            playerTwoAvitarNode.attachObject(playerTwoAvitar);
+            playerTwo.attachChild(playerTwoAvitarNode);
+            playerTwo.attachChild(playerTwoCameraNode);
+        }
+        
         // set initail positions of game objects
         BNode.setLocalPosition(0.0f, -2.0f, 0.0f);
         boxN.setLocalPosition(5f,0f,0.0f);

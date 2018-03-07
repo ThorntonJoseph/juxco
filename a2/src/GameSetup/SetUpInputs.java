@@ -7,11 +7,8 @@ package GameSetup;
 
 import a2.MyGame;
 import java.util.Iterator;
-import myGameEngine.PlayerMovementActions;
-import myGameEngine.ToggleCameraAction;
 import myGameEngine.ToggleCameraAction;
 import net.java.games.input.Controller;
-import ray.input.GenericInputManager;
 import ray.input.InputManager;
 import myGameEngine.PlayerMovementActions;
 import ray.input.action.Action;
@@ -36,7 +33,9 @@ public class SetUpInputs {
         playerTwoView = p2c;
         game=g;
         setupPlayerOneController();
-        setupPlayerTwoController();
+        if(im.getFirstGamepadName()!=null){
+            setupPlayerTwoController();
+        } 
     }
     public Controller getKeboard(){
         return kb;
@@ -48,9 +47,7 @@ public class SetUpInputs {
         
         Iterator<Controller> itr = im.getControllers().iterator();
         kb = itr.next();
-        kb=itr.next();
-        kb=itr.next();
-
+        
         // create actions for inputs 
         Action playerMovement = new PlayerMovementActions(playerOneView,playerOneNode,game);
         Action toggleCamera = new ToggleCameraAction(playerOneView,playerOneNode);

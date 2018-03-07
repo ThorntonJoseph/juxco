@@ -5,6 +5,7 @@
  */
 package myGameEngine;
 
+import GameSetup.SetUpInputs;
 import net.java.games.input.Controller;
 import net.java.games.input.Event;
 import ray.input.InputManager;
@@ -93,7 +94,6 @@ public class Camera3Pcontroller {
         
         @Override
         public void performAction(float f, Event event) {
-            System.out.println(event.getComponent().toString());
            float rotAmount;
            float eventvalue;
            if(event.getComponent().toString().equals("X Rotation")||

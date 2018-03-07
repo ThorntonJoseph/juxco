@@ -5,6 +5,7 @@
  */
 package GameSetup;
 
+import ray.input.InputManager;
 import ray.rage.rendersystem.RenderWindow;
 import ray.rage.scene.Camera;
 import ray.rage.scene.SceneManager;
@@ -32,11 +33,11 @@ public class SetUpCameras {
     public SceneNode getPlayerTwoCameraN(){
         return secondCameraN;
     }
-    public SetUpCameras(SceneManager sm, RenderWindow rw){
-        setupCameras(sm,rw);
+    public SetUpCameras(SceneManager sm, RenderWindow rw,InputManager im){
+        setupCameras(sm,rw,im);
     }
     
-    protected void setupCameras(SceneManager sm, RenderWindow rw){
+    protected void setupCameras(SceneManager sm, RenderWindow rw,InputManager im){
         //first camera
         SceneNode rootNode = sm.getRootSceneNode();
         firstCamera = sm.createCamera("Player1Camera", Camera.Frustum.Projection.PERSPECTIVE);
@@ -49,17 +50,17 @@ public class SetUpCameras {
         firstCameraN.attachObject(firstCamera);
         firstCamera.setMode('n');
         firstCamera.getFrustum().setFarClipDistance(1000f);
-       
-        secondCamera = sm.createCamera("Player2Camera", Camera.Frustum.Projection.PERSPECTIVE);
-        rw.getViewport(1).setCamera(secondCamera);
-        secondCamera.setRt((Vector3f)Vector3f.createFrom(1.0f, 0.0f, 0.0f));
-	secondCamera.setUp((Vector3f)Vector3f.createFrom(0.0f, 1.0f, 0.0f));
-	secondCamera.setFd((Vector3f)Vector3f.createFrom(0.0f, 0.0f, -1.0f));
-	secondCamera.setPo((Vector3f)Vector3f.createFrom(0.0f, 0.0f, 0.0f));
-        secondCameraN = rootNode.createChildSceneNode(secondCamera.getName()+"Node");
-        secondCameraN.attachObject(secondCamera);
-        secondCamera.setMode('n');
-        secondCamera.getFrustum().setFarClipDistance(1000f);
-
+       if(im.getFirstGamepadName()!=null){
+           secondCamera = sm.createCamera("Player2Camera", Camera.Frustum.Projection.PERSPECTIVE);
+            rw.getViewport(1).setCamera(secondCamera);
+            secondCamera.setRt((Vector3f)Vector3f.createFrom(1.0f, 0.0f, 0.0f));
+            secondCamera.setUp((Vector3f)Vector3f.createFrom(0.0f, 1.0f, 0.0f));
+            secondCamera.setFd((Vector3f)Vector3f.createFrom(0.0f, 0.0f, -1.0f));
+            secondCamera.setPo((Vector3f)Vector3f.createFrom(0.0f, 0.0f, 0.0f));
+            secondCameraN = rootNode.createChildSceneNode(secondCamera.getName()+"Node");
+            secondCameraN.attachObject(secondCamera);
+            secondCamera.setMode('n');
+            secondCamera.getFrustum().setFarClipDistance(1000f);
+       }
     }
 }
