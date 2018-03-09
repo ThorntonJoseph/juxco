@@ -22,7 +22,7 @@ import ray.rml.Vector4f;
  */
     public class PlayerMovementActions extends AbstractInputAction {
         private Camera playerC;
-        
+        private boolean enabled = true;
         private SceneNode playerD;
         private MyGame game;
         Matrix4f rx,ry,rz;
@@ -47,7 +47,10 @@ import ray.rml.Vector4f;
             r = Math.sqrt(r);
             return (float) r; 
     }
-   
+   public void setenabled(boolean enable){
+       enabled = enable;
+   }
+  
     @Override
     public void performAction(float f, Event event) {
         // dolphin variables
@@ -57,12 +60,13 @@ import ray.rml.Vector4f;
         Vector4f ra1,ra2,ra3,r1,r2,r3;
         //player is camera 
         //rotating the dolphin /arrow keys
-            if(event.getComponent().toString().equals("A")||event.getComponent().toString().equals("D")
-                    ||(event.getComponent().toString().equals("X Axis")&& (event.getValue()>0.2f||event.getValue()<-0.2f))){
+        
+            if(((event.getComponent().toString().equals("A")||event.getComponent().toString().equals("D")
+                    ||event.getComponent().toString().equals("X Axis")&& (event.getValue()>0.2f||event.getValue()<-0.2f))&&enabled==true)){
                 float temp = event.getValue();
                 if(event.getComponent().toString().equals("A"))
                     temp = -temp;
-                playerD.yaw(Degreef.createFrom(-2f*temp));
+                playerD.rotate(Degreef.createFrom(-2f*temp),Vector3f.createFrom(0f,1f,0f));
         //playerD.rotate(Degreef.createFrom(-2f), playerD.getLocalUpAxis());
 
         //forward,back,left right movement on dolphin/WASD
@@ -72,14 +76,28 @@ import ray.rml.Vector4f;
                 if(event.getComponent().toString().equals("S")||event.getComponent().toString().equals("Y Axis"))
                    temp = -temp;
                 p = playerD.getWorldForwardAxis();
-                p1 = Vector3f.createFrom(temp* game.getdeltatime()*p.x()/100f,temp*game.getdeltatime()*p.y()/100f,temp*game.getdeltatime()*p.z()/100f);
+                p1 = Vector3f.createFrom(temp* game.getdeltatime()*p.x()/100f,0.0f,temp*game.getdeltatime()*p.z()/100f);
                 p2 = p.add(p1);
                 playerD.setLocalPosition(playerD.getWorldPosition().add(p1));
             }
-            // creates boundries for dolphins
-            
-        }
+            if(playerD.getLocalPosition().x()<=-24f && (event.getComponent().toString().equals("W")||event.getComponent().toString().equals("S"))){
+                playerD.setLocalPosition(-24f,playerD.getLocalPosition().y(),playerD.getLocalPosition().z());
+            }else if(playerD.getLocalPosition().x()>=-1f && (event.getComponent().toString().equals("W")||event.getComponent().toString().equals("S"))){
+                playerD.setLocalPosition(-1f,playerD.getLocalPosition().y(),playerD.getLocalPosition().z());
+            }
+            if(playerD.getLocalPosition().x()>=24f && event.getComponent().toString().equals("Y Axis")){
+                playerD.setLocalPosition(24f,playerD.getLocalPosition().y(),playerD.getLocalPosition().z());
+            }else if(playerD.getLocalPosition().x()<=1f && event.getComponent().toString().equals("Y Axis")){
+                playerD.setLocalPosition(1f,playerD.getLocalPosition().y(),playerD.getLocalPosition().z());
+            }
+            if(playerD.getLocalPosition().z()>=14f){
+                playerD.setLocalPosition(playerD.getLocalPosition().x(),playerD.getLocalPosition().y(),14f);
+            }else if(playerD.getLocalPosition().z()<=-14f){
+                playerD.setLocalPosition(playerD.getLocalPosition().x(),playerD.getLocalPosition().y(),-14f);
+            }
         
+        }
+    
 
     }
     

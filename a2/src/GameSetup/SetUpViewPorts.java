@@ -15,19 +15,19 @@ import ray.rage.rendersystem.Viewport;
  * @author Joe
  */
 public class SetUpViewPorts {
+    private RenderWindow rw;
     public SetUpViewPorts(RenderWindow rw,InputManager im){
+        this.rw=rw;
         setupWindowViewPorts(rw,im);
     }
+    
     protected void setupWindowViewPorts(RenderWindow rw,InputManager im){
         if(im.getFirstGamepadName()!= null){
-            System.out.println("execute");
             Viewport p1View = rw.getViewport(0);
             p1View.setDimensions(.51f,.01f,.99f,.49f);
             Viewport p2View = rw.createViewport(.01f, .01f,.99f,.49f);
-        }else
-        {
-            
         }
+        
         }
         
        
