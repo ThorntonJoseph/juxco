@@ -34,6 +34,7 @@ public class PlayerBuckController extends AbstractController {
         super();
         this.pm=pm;
     }
+    
     public boolean getenabled(){
         return hit;
     }

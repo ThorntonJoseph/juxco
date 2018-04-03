@@ -47,6 +47,7 @@ public class Camera3Pcontroller {
         
         
     }
+    
 
     public void updateCameraPositon() { 
         double theta = Math.toRadians(azimuth); // rot around target

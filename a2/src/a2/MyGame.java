@@ -300,11 +300,11 @@ public class MyGame extends VariableFrameRateGame{
         // set initail positions of game objects
         // setup ball
         sball = sm.getRootSceneNode().createChildSceneNode("ball");
-        ballcontrol = new BallControl(ps1,ps2,sball,this);
+        ballcontrol = new BallControl(ps1,ps2,sball,this,playerOneAvitarNode,playerTwoAvitarNode);
         Material sballmtl = sm.getMaterialManager().getAssetByPath("soccerballobj.mtl");
         ball.setMaterial(sballmtl);
         sball.attachObject(ball);
-        sball.setLocalPosition(0f,200f,0f);
+        sball.setLocalPosition(-10f,200f,0f);
         sball.scale(2f, 2f, 2f);
         // setting up the lights
         sm.getAmbientLight().setIntensity(new Color(.1f, .1f, .1f));

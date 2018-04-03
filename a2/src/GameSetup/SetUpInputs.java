@@ -57,8 +57,8 @@ public class SetUpInputs {
     private void setupPlayerOneController(){
         
         Iterator<Controller> itr = im.getControllers().iterator();
-        itr.next();
-        itr.next();
+        //itr.next();
+        //itr.next();
         kb = itr.next();
         // create actions for inputs 
         pmkb = new PlayerMovementActions(playerOneView,playerOneNode,game);
